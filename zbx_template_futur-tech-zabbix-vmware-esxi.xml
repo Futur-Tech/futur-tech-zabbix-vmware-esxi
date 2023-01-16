@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-01-14T12:02:13Z</date>
+    <date>2023-01-16T00:17:03Z</date>
     <groups>
         <group>
             <name>Devices/Hypervisors</name>
@@ -109,9 +109,7 @@
 
 const regex = /^([A-Za-z0-9_-]+)/g;
 
-for(var row = 0; row &lt; jsonData.length; row++){
-    nameArr= jsonData[row][&quot;{#HV.NAME}&quot;].match(regex);
-    jsonData[row][&quot;{#HV.NAME.VISIBLE}&quot;]=jsonData[row][&quot;{#HV.NAME}&quot;].match(regex)[0].toUpperCase();
+for(var row = 0; row &lt; jsonData.length; row++){ nameArr= jsonData[row][&quot;{#HV.NAME}&quot;].match(regex); jsonData[row][&quot;{#HV.NAME.VISIBLE}&quot;]=jsonData[row][&quot;{#HV.NAME}&quot;].match(regex)[0].toUpperCase();
 }
 
 return JSON.stringify(jsonData);</params>
@@ -157,9 +155,7 @@ return JSON.stringify(jsonData);</params>
 
 const regex = /^([A-Za-z0-9_-]+)/g;
 
-for(var row = 0; row &lt; jsonData.length; row++){
-    nameArr= jsonData[row][&quot;{#HV.NAME}&quot;].match(regex);
-    jsonData[row][&quot;{#HV.NAME.VISIBLE}&quot;]=jsonData[row][&quot;{#HV.NAME}&quot;].match(regex)[0].toUpperCase();
+for(var row = 0; row &lt; jsonData.length; row++){ nameArr= jsonData[row][&quot;{#HV.NAME}&quot;].match(regex); jsonData[row][&quot;{#HV.NAME.VISIBLE}&quot;]=jsonData[row][&quot;{#HV.NAME}&quot;].match(regex)[0].toUpperCase();
 }
 
 return JSON.stringify(jsonData);</params>
@@ -207,4 +203,14 @@ return JSON.stringify(jsonData);</params>
             </groups>
         </template>
     </templates>
+    <triggers>
+        <trigger>
+            <expression>{Template Futur-Tech VM VMware Guest:vmware.vm.memory.size.swapped[{$VMWARE.URL},{HOST.HOST}].last()}&gt;0</expression>
+            <name>VM is swapping</name>
+            <opdata>Hypervisor swap used: {ITEM.LASTVALUE1}</opdata>
+            <priority>WARNING</priority>
+            <description>VM swap degrade highly the overall performance.</description>
+            <manual_close>YES</manual_close>
+        </trigger>
+    </triggers>
 </zabbix_export>
