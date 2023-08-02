@@ -7,3 +7,6 @@ Modification Futur-Tech:
 - Disable: Discover VMware hypervisors
 - Disable: Discover VMware VMs
 - Disable: vmware.fullname[{$VMWARE.URL}]
+
+Added templates:
+- **Template Futur-Tech Module VMware ESXi Port Monitoring:** this template is to monitor open port on ESXi hypervisor. It use the agent interface IP address.

@@ -1,0 +1,376 @@
+zabbix_export:
+  version: '6.0'
+  date: '2023-08-02T17:15:44Z'
+  groups:
+    - uuid: 89f86aa9e7484c248baffeed540bf9ad
+      name: Devices/Hypervisors
+    - uuid: 6089e67efddc434e978b28284257abae
+      name: 'Devices/Virtual machines'
+    - uuid: 7f27dc73981940769811e7fae4a26772
+      name: Templates/Futur-Tech/Applications
+    - uuid: 2f124172ea8e4ece8558f3d2d3d9626b
+      name: 'Templates/Futur-Tech/Modules ESXi'
+    - uuid: a702b6b82a354963af636e834c611eb0
+      name: 'Templates/Futur-Tech/Operating systems'
+  templates:
+    - uuid: 4ab7ba37dbe9483f84551545e3a5d8bc
+      template: 'Futur-Tech Module VMware ESXi port monitoring'
+      name: 'Futur-Tech Module VMware ESXi port monitoring'
+      description: |
+        This template is to monitor open port on ESXi hypervisor.
+        It use the agent interface IP address.
+      groups:
+        - name: 'Templates/Futur-Tech/Modules ESXi'
+      items:
+        - uuid: 78d84828be724f769ad31e0d27730d99
+          name: 'VMware: HTTPS port'
+          type: SIMPLE
+          key: 'net.tcp.service[https]'
+          delay: 5m
+          description: 'This is likely because hypervisor is down.'
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: Application
+              value: 'VMware Services'
+          triggers:
+            - uuid: 481d69f52f2847e48dcc8b9dd767fc74
+              expression: 'last(/Futur-Tech Module VMware ESXi port monitoring/net.tcp.service[https])=0'
+              name: 'HTTPS port is not answering'
+              url: 'https://{HOST.IP}/ui/'
+              priority: HIGH
+        - uuid: f549aef965344167bfed80b824e27256
+          name: 'VMware: HTTP port'
+          type: SIMPLE
+          key: 'net.tcp.service[http]'
+          delay: 5m
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: Application
+              value: 'VMware Services'
+          triggers:
+            - uuid: e084a5bde4b94703bdd9f575e170c364
+              expression: 'last(/Futur-Tech Module VMware ESXi port monitoring/net.tcp.service[http])=1'
+              name: 'HTTP port is listening'
+              url: 'https://{HOST.IP}/ui/#/host/networking/firewall'
+              priority: AVERAGE
+              description: |
+                Keep your exposed ports to the minimum.
+                
+                More info about port requirements for ESXi:
+                https://kb.vmware.com/s/article/2039095
+        - uuid: 8f4029bd4cc344c485f2a5447dc44be6
+          name: 'VMware: SSH port'
+          type: SIMPLE
+          key: 'net.tcp.service[ssh]'
+          delay: 5m
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: Application
+              value: 'VMware Services'
+          triggers:
+            - uuid: 483f8b2994a34780ad4c911e9f103ad9
+              expression: 'last(/Futur-Tech Module VMware ESXi port monitoring/net.tcp.service[ssh])=1'
+              name: 'SSH port is listening'
+              url: 'https://{HOST.IP}/ui'
+              priority: HIGH
+              description: 'Disable SSH service when not using it.'
+        - uuid: 514d1ba706d942eb9b1871be6f2dac8c
+          name: 'VMware: CIM SLP port'
+          type: SIMPLE
+          key: 'net.tcp.service[tcp,,427]'
+          delay: 5m
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: Application
+              value: 'VMware Services'
+          triggers:
+            - uuid: 167bffe64bee4202aa52b27ac243e01e
+              expression: 'last(/Futur-Tech Module VMware ESXi port monitoring/net.tcp.service[tcp,,427])=1'
+              name: 'CIM SLP port is listening'
+              url: 'https://{HOST.IP}/ui/#/host/networking/firewall'
+              priority: HIGH
+              description: |
+                OpenSLP vulnerabilities have been disclosed that affect ESXi.
+                https://kb.vmware.com/s/article/76372
+                
+                More info about port requirements for ESXi:
+                https://kb.vmware.com/s/article/2039095
+        - uuid: 8bde3cc5881c44bfab7ad58cc42320e6
+          name: 'VMware: CIM Server port'
+          type: SIMPLE
+          key: 'net.tcp.service[tcp,,5988]'
+          delay: 5m
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: Application
+              value: 'VMware Services'
+          triggers:
+            - uuid: c4cadee0dc664b0bbdc0680e458c26f8
+              expression: 'last(/Futur-Tech Module VMware ESXi port monitoring/net.tcp.service[tcp,,5988])=1'
+              name: 'CIM Server port is listening'
+              url: 'https://{HOST.IP}/ui/#/host/networking/firewall'
+              priority: AVERAGE
+              description: |
+                Keep your exposed ports to the minimum.
+                
+                More info about port requirements for ESXi:
+                https://kb.vmware.com/s/article/2039095
+        - uuid: b62938ebdbf9447d8739318b347ee3cc
+          name: 'VMware: CIM Secure Server port'
+          type: SIMPLE
+          key: 'net.tcp.service[tcp,,5989]'
+          delay: 5m
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: Application
+              value: 'VMware Services'
+          triggers:
+            - uuid: 8c123b54a45e4ddd971e83233eeb3cb3
+              expression: 'last(/Futur-Tech Module VMware ESXi port monitoring/net.tcp.service[tcp,,5989])=1'
+              name: 'CIM Secure Server port is listening'
+              url: 'https://{HOST.IP}/ui/#/host/networking/firewall'
+              priority: AVERAGE
+              description: |
+                Keep your exposed ports to the minimum.
+                
+                More info about port requirements for ESXi:
+                https://kb.vmware.com/s/article/2039095
+        - uuid: 46d99314267c49348064681ccc2385bd
+          name: 'VMware: vsanvp port'
+          type: SIMPLE
+          key: 'net.tcp.service[tcp,,8080]'
+          delay: 5m
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: Application
+              value: 'VMware Services'
+          triggers:
+            - uuid: aad0cf49fc954e7cacab0d3781d8b0b7
+              expression: 'last(/Futur-Tech Module VMware ESXi port monitoring/net.tcp.service[tcp,,8080])=1'
+              name: 'vsanvp port is listening'
+              url: 'https://{HOST.IP}/ui/#/host/networking/firewall'
+              priority: AVERAGE
+              description: |
+                Keep your exposed ports to the minimum.
+                
+                More info about port requirements for ESXi:
+                https://kb.vmware.com/s/article/2039095
+        - uuid: be63907861e74c9ca5b5a2ced9aa777f
+          name: 'VMware: iofiltervp port'
+          type: SIMPLE
+          key: 'net.tcp.service[tcp,,9080]'
+          delay: 5m
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: Application
+              value: 'VMware Services'
+          triggers:
+            - uuid: 134020d49aae4ba9af862049b1f9fc47
+              expression: 'last(/Futur-Tech Module VMware ESXi port monitoring/net.tcp.service[tcp,,9080])=1'
+              name: 'iofiltervp port is listening'
+              url: 'https://{HOST.IP}/ui/#/host/networking/firewall'
+              priority: AVERAGE
+              description: |
+                Keep your exposed ports to the minimum.
+                
+                More info about port requirements for ESXi:
+                https://kb.vmware.com/s/article/2039095
+      tags:
+        - tag: Futur-Tech
+      valuemaps:
+        - uuid: a797c605ecda4c70be03edb9a3d50700
+          name: 'Service state'
+          mappings:
+            - value: '0'
+              newvalue: Down
+            - value: '1'
+              newvalue: Up
+    - uuid: 13d2af3af1874e33adc76a082b72d933
+      template: 'Futur-Tech VM VMware Guest'
+      name: 'Futur-Tech VM VMware Guest'
+      templates:
+        - name: 'VMware Guest'
+      groups:
+        - name: Templates/Futur-Tech/Applications
+      tags:
+        - tag: Futur-Tech
+    - uuid: 8382801acd984e90982a00870c3b2470
+      template: 'Futur-Tech VM VMware Hypervisor'
+      name: 'Futur-Tech VM VMware Hypervisor'
+      templates:
+        - name: 'VMware Hypervisor'
+      groups:
+        - name: Templates/Futur-Tech/Applications
+      tags:
+        - tag: Futur-Tech
+    - uuid: 094acd2f81814bb7a0f7563a0b578601
+      template: 'Futur-Tech VMware ESXi'
+      name: 'Futur-Tech VMware ESXi'
+      description: |
+        Modification Futur-Tech:
+        - Item "VMware: Full name" modified to decrease heartbeat. Needed for trigger.
+        - Modified LLD rules for Hypervisors and VMs
+        - Disable: Discover VMware hypervisors
+        - Disable: Discover VMware VMs
+        - Disable: vmware.fullname[{$VMWARE.URL}]
+        - Added template Template Futur-Tech Module VMware ESXi Port Monitoring
+      templates:
+        - name: 'Futur-Tech Module VMware ESXi port monitoring'
+        - name: VMware
+      groups:
+        - name: 'Templates/Futur-Tech/Operating systems'
+      items:
+        - uuid: a3c4751aac5c49d09b347e6314509384
+          name: 'VMware: Full name'
+          type: SIMPLE
+          key: 'vmware.fullname["{$VMWARE.URL}"]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'VMware service full name.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 2h
+          tags:
+            - tag: Application
+              value: VMware
+          triggers:
+            - uuid: 6dc3777e17da46c5b3d1b61ee59484ca
+              expression: 'nodata(/Futur-Tech VMware ESXi/vmware.fullname["{$VMWARE.URL}"],{$HYPERVISOR.NODATA_TIMEOUT})=1'
+              name: 'No VMware data for {$HYPERVISOR.NODATA_TIMEOUT}'
+              priority: HIGH
+              description: 'Check your login and connection data in Zabbix Server'
+      discovery_rules:
+        - uuid: 63ef6428978a433783e0cd7e13d48de5
+          name: 'Futur-Tech Discover VMware hypervisors'
+          type: SIMPLE
+          key: 'vmware.hv.discovery["{$VMWARE.URL}"]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Discovery of hypervisors.'
+          host_prototypes:
+            - uuid: 11286e8a70d94756a31acd011448fbac
+              host: '{#HV.UUID}'
+              name: '{#HV.NAME.VISIBLE} LLD'
+              group_links:
+                - group:
+                    name: Devices/Hypervisors
+              group_prototypes:
+                - name: 'Discovery/{#HV.NAME.VISIBLE}/VMware Hypervisor'
+              templates:
+                - name: 'Futur-Tech VM VMware Hypervisor'
+              macros:
+                - macro: '{$VMWARE.HV.UUID}'
+                  value: '{#HV.UUID}'
+                  description: 'UUID of hypervisor.'
+              custom_interfaces: 'YES'
+              interfaces:
+                - ip: '{#HV.IP}'
+              inventory_mode: AUTOMATIC
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var jsonData = JSON.parse(value);
+                  
+                  const regex = /^([A-Za-z0-9_-]+)/g;
+                  
+                  for(var row = 0; row < jsonData.length; row++){
+                      nameArr= jsonData[row]["{#HV.NAME}"].match(regex);
+                      jsonData[row]["{#HV.NAME.VISIBLE}"]=jsonData[row]["{#HV.NAME}"].match(regex)[0].toUpperCase();
+                  }
+                  
+                  return JSON.stringify(jsonData);
+        - uuid: 0bc31477fa784201855312cdcd1af956
+          name: 'Futur-Tech Discover VMware VMs'
+          type: SIMPLE
+          key: 'vmware.vm.discovery["{$VMWARE.URL}"]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Discovery of guest virtual machines.'
+          host_prototypes:
+            - uuid: 87d1b97f2cd6467ea7b430941f175a34
+              host: '{#VM.UUID}'
+              name: '{#HV.NAME.VISIBLE} LLD - VM:{#VM.NAME}'
+              group_links:
+                - group:
+                    name: 'Devices/Virtual machines'
+              group_prototypes:
+                - name: 'Discovery/{#HV.NAME.VISIBLE}/VMware VM'
+              templates:
+                - name: 'Futur-Tech VM VMware Guest'
+              macros:
+                - macro: '{$VMWARE.VM.UUID}'
+                  value: '{#VM.UUID}'
+                  description: 'UUID of guest virtual machine.'
+              custom_interfaces: 'YES'
+              interfaces:
+                - ip: '{#VM.IP}'
+              inventory_mode: AUTOMATIC
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var jsonData = JSON.parse(value);
+                  
+                  const regex = /^([A-Za-z0-9_-]+)/g;
+                  
+                  for(var row = 0; row < jsonData.length; row++){
+                      nameArr= jsonData[row]["{#HV.NAME}"].match(regex);
+                      jsonData[row]["{#HV.NAME.VISIBLE}"]=jsonData[row]["{#HV.NAME}"].match(regex)[0].toUpperCase();
+                  }
+                  
+                  return JSON.stringify(jsonData);
+      tags:
+        - tag: Futur-Tech
+      macros:
+        - macro: '{$HYPERVISOR.NODATA_TIMEOUT}'
+          value: 3h
+        - macro: '{$VMWARE_PERF_INTERVAL}'
+          value: 1m
